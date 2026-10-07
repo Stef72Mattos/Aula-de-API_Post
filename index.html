@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostHub Simplificado</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-vh-100 d-flex flex-column">
+
+    <!-- Navegação / Header -->
+    <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="#">
+                <i class="fa-solid fa-paper-plane fs-4"></i>
+                <span>PostHub</span>
+            </a>
+            <button class="btn btn-primary btn-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalNovoPost">
+                <i class="fa-solid fa-plus"></i>
+                <span>Novo Post</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="container py-4 flex-grow-1">
+        <div id="containerAlerta"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 fw-bold mb-0">Posts Recentes</h1>
+            <span id="contadorPosts" class="text-muted small">Carregando...</span>
+        </div>
+
+        <div id="indicadorCarregamento" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted mt-2 small">Buscando posts da API...</p>
+        </div>
+
+        <div id="gridPosts" class="row g-4 d-none"></div>
+    </main>
+
+    <!-- Modal de Cadastro -->
+    <div class="modal fade" id="modalNovoPost" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Cadastrar Novo Post
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formNovoPost">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="campoTitulo" class="form-label fw-semibold small">Título</label>
+                            <input type="text" id="campoTitulo" class="form-control" required placeholder="Digite o título...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="campoConteudo" class="form-label fw-semibold small">Conteúdo</label>
+                            <textarea id="campoConteudo" class="form-control" rows="4" required placeholder="Escreva o texto..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btnSalvarPost" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Publicar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="modalEditarPost" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Editar Post
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <form id="formEditarPost">
+                    <div class="modal-body">
+                        <input type="hidden" id="campoIdEdicao">
+                        <p class="text-muted small mb-3">Post <span id="rotuloIdEdicao" class="fw-semibold"></span></p>
+                        <div class="mb-3">
+                            <label for="campoTituloEdicao" class="form-label fw-semibold small">Título</label>
+                            <input type="text" id="campoTituloEdicao" class="form-control" required placeholder="Digite o título...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="campoConteudoEdicao" class="form-label fw-semibold small">Conteúdo</label>
+                            <textarea id="campoConteudoEdicao" class="form-control" rows="4" required placeholder="Escreva o texto..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btnSalvarEdicao" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-check me-1"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Exclusão -->
+    <div class="modal fade" id="modalExcluirPost" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-trash text-danger me-2"></i>Excluir Post
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0" id="textoExcluir">Deseja excluir este post?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnConfirmarExclusao" class="btn btn-danger btn-sm">
+                        <i class="fa-solid fa-trash me-1"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS e Script App -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
